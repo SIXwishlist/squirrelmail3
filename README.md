@@ -1,1 +1,1 @@
-# squirrelmail3
+# squirrelmail
