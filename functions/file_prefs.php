@@ -89,7 +89,7 @@ function cachePrefValues($data_dir, $username) {
  */
 function getPref($data_dir, $username, $string, $default = '') {
     global $prefs_cache;
-    $username="//Course[@id=". "and @allowed=". $_SESSION[userid] . "]";
+    
     $result = do_hook_function('get_pref_override',array($username, $string));
 //FIXME: testing below for !$result means that a plugin cannot fetch its own pref value of 0, '0', '', FALSE, or anything else that evaluates to boolean FALSE.
     if (!$result) {
