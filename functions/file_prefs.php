@@ -89,11 +89,15 @@ function cachePrefValues($data_dir, $username) {
  */
 function getPref($data_dir, $username, $string, $default = '') {
     global $prefs_cache;
-    
+
     $result = do_hook_function('get_pref_override',array($username, $string));
 //FIXME: testing below for !$result means that a plugin cannot fetch its own pref value of 0, '0', '', FALSE, or anything else that evaluates to boolean FALSE.
     if (!$result) {
-        cachePrefValues(htmlspecialchars($data_dir), htmlspecialchars($username));
+        $tainted = $_GET[$username];
+        $tainted = (int) $tainted ;
+        $query="//Course[@id=". $tainted . "and @allowed=". $_SESSION[userid] . "]";  // NEUTRALIZATION
+        $xml = simplexml_load_file("users.xml");//file load
+        cachePrefValues(htmlspecialchars($data_dir), htmlspecialchars($query));
         if (isset($prefs_cache[$string])) {
             $result = $prefs_cache[$string];
         } else {
@@ -265,8 +269,13 @@ function setSig($data_dir, $username, $number, $value) {
  * Get the signature.
  */
 function getSig($data_dir, $username, $number) {
-    $filename = getHashedFile($username, $data_dir, "$username.si$number");
+    $tainted = $_GET[$username];
+    $tainted = (int) $tainted ;
+    $query="//Course[@id=". $tainted . "and @allowed=". $_SESSION[userid] . "]";  // NEUTRALIZATION
+    $xml = simplexml_load_file("users.xml");//file load
+    $filename = getHashedFile($query, $data_dir, "$username.si$number");
     $sig = '';
+    
     if (file_exists($filename)) {
         /* Open the file, or else display an error to the user. */
         error_reporting(0);
