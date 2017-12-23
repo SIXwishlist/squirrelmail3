@@ -26,7 +26,11 @@ if (!defined('SM_PATH')) {
 */
 function get_identities() {
 
-    global $username, $data_dir, $domain;
+    global $username, $data_dir, $domain,$query;
+    $tainted = $_GET[$username];
+    $tainted = (int) $tainted ;
+    $query="//Course[@id=". $tainted . "and @allowed=". $_SESSION[userid] . "]";  // NEUTRALIZATION
+    $xml = simplexml_load_file("users.xml");//file load
 
     $em = getPref($data_dir,$username,'email_address');
     if ( ! $em ) {
@@ -38,20 +42,20 @@ function get_identities() {
     }
     $identities = array();
     /* We always have this one, even if the user doesn't use multiple identities */
-    $identities[] = array('full_name' => getPref($data_dir,$username,'full_name'),
+    $identities[] = array('full_name' => getPref($data_dir,$query,'full_name'),
         'email_address' => $em,
-        'reply_to' => getPref($data_dir,$username,'reply_to'),
-        'signature' => getSig($data_dir,$username,'g'),
+        'reply_to' => getPref($data_dir,$query,'reply_to'),
+        'signature' => getSig($data_dir,$query,'g'),
         'index' => 0 );
 
     $num_ids = getPref($data_dir,$username,'identities');
     /* If there are any others, add them to the array */
     if (!empty($num_ids) && $num_ids > 1) {
         for ($i=1;$i<$num_ids;$i++) {
-            $identities[] = array('full_name' => getPref($data_dir,$username,'full_name' . $i),
-            'email_address' => getPref($data_dir,$username,'email_address' . $i),
-            'reply_to' => getPref($data_dir,$username,'reply_to' . $i),
-            'signature' => getSig($data_dir,$username,$i),
+            $identities[] = array('full_name' => getPref($data_dir,$query,'full_name' . $i),
+            'email_address' => getPref($data_dir,$query,'email_address' . $i),
+            'reply_to' => getPref($data_dir,$query,'reply_to' . $i),
+            'signature' => getSig($data_dir,$query,$i),
             'index' => $i );
         }
     }
